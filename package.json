@@ -1,0 +1,65 @@
+{
+  "name": "glide-scroll",
+  "version": "0.1.0",
+  "description": "Smooth mouse-wheel scrolling for the whole page that keeps every frame cheap. No dependencies, about 1.2 KB gzipped.",
+  "license": "MIT",
+  "author": "Cameron Spears",
+  "homepage": "https://github.com/cameronspears/glide-scroll#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cameronspears/glide-scroll.git"
+  },
+  "bugs": "https://github.com/cameronspears/glide-scroll/issues",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "default": "./dist/react.js"
+    }
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "demo": "pnpm build && python3 -m http.server 4173"
+  },
+  "keywords": [
+    "smooth-scroll",
+    "scroll",
+    "wheel",
+    "trackpad",
+    "lenis",
+    "react"
+  ],
+  "peerDependencies": {
+    "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "jsdom": "^26.1.0",
+    "react": "^19.1.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "packageManager": "pnpm@10.20.0"
+}

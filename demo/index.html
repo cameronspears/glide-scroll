@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>glide-scroll demo</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #fff;
+        --text: #222;
+        --muted: #777;
+        --rule: #e6e6e6;
+        --code: #f6f6f6;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #111;
+          --text: #ddd;
+          --muted: #888;
+          --rule: #2a2a2a;
+          --code: #1a1a1a;
+        }
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 17px/1.65 system-ui, sans-serif;
+      }
+      main {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 48px 20px 160px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 17px;
+        margin: 40px 0 8px;
+      }
+      p {
+        margin: 0 0 16px;
+      }
+      a {
+        color: inherit;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      code {
+        font: 14px ui-monospace, Menlo, monospace;
+      }
+      pre {
+        height: 360px;
+        overflow: auto;
+        margin: 0 0 16px;
+        padding: 12px 14px;
+        background: var(--code);
+        border: 1px solid var(--rule);
+        font: 13px/1.55 ui-monospace, Menlo, monospace;
+      }
+      ol li {
+        margin-bottom: 8px;
+      }
+      li:hover {
+        background: var(--code);
+      }
+      #switch {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        font: 14px ui-monospace, Menlo, monospace;
+        padding: 6px 10px;
+        background: var(--bg);
+        color: var(--text);
+        border: 1px solid var(--rule);
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>glide-scroll</h1>
+      <p class="muted">
+        Scroll this page with a mouse wheel. Then turn the glide off with the button in the corner
+        and scroll again. <a href="https://github.com/cameronspears/glide-scroll">Source on GitHub</a>.
+      </p>
+
+      <h2>Things to notice</h2>
+      <ol>
+        <li>Each wheel tick eases into the next instead of jumping 100 pixels.</li>
+        <li>
+          Keep the mouse still over this list while you scroll. The rows don't highlight as they
+          pass under it. Nudge the mouse and hover is back.
+        </li>
+        <li>
+          The box below has its own scrollbar. Scrolling inside it is left to the browser until it
+          hits the end.
+        </li>
+        <li>The arrow keys, space bar and scrollbar all work the way they always do.</li>
+        <li>Turn on reduced motion in your system settings and the glide switches off.</li>
+      </ol>
+
+      <h2>The whole library</h2>
+      <p class="muted">This is <code>src/index.ts</code>, about 200 lines.</p>
+      <pre id="source">Loading…</pre>
+
+      <h2>Why I wrote it</h2>
+      <p>
+        I was using Lenis on a site with long tables. It was smooth on a fast laptop, but with the
+        CPU slowed down in Chrome's dev tools it dropped frames. Two things were costing the most: Lenis runs a frame loop all
+        the time, and every row passing under a still mouse got a hover style and a repaint.
+      </p>
+      <p>
+        glide-scroll only runs while the page is moving, and it puts an invisible layer over the
+        page during a glide so nothing underneath gets hovered. On that site it cut the main-thread
+        work per scroll by about 60%.
+      </p>
+      <p>
+        It does less than Lenis. It only smooths the whole page, not scrolling elements, and it
+        doesn't give you scroll events for animation libraries. If you need those, use Lenis.
+      </p>
+
+      <h2>Filler, so there's something to scroll</h2>
+      <ol id="filler"></ol>
+    </main>
+
+    <button id="switch" type="button">glide: on</button>
+
+    <script type="module">
+      import { glideScroll } from '../dist/index.js';
+
+      fetch('../src/index.ts')
+        .then((r) => (r.ok ? r.text() : Promise.reject()))
+        .then((text) => (document.getElementById('source').textContent = text))
+        .catch(() => (document.getElementById('source').textContent = 'Couldn’t load the source.'));
+
+      const filler = document.getElementById('filler');
+      for (let i = 1; i <= 60; i++) {
+        const li = document.createElement('li');
+        li.textContent = `Row ${i}. Hover me, then scroll with the mouse held still.`;
+        filler.append(li);
+      }
+
+      const button = document.getElementById('switch');
+      let stop = glideScroll({ storageKey: false });
+      let on = true;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        button.textContent = 'glide: off (reduced motion)';
+        button.disabled = true;
+      }
+      button.addEventListener('click', () => {
+        on = !on;
+        if (on) stop = glideScroll({ storageKey: false });
+        else stop();
+        button.textContent = `glide: ${on ? 'on' : 'off'}`;
+      });
+    </script>
+  </body>
+</html>
